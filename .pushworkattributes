@@ -1,0 +1,5 @@
+# Notebooks open in Patchwork's Jupyter tool; keep @patchwork out of the .ipynb files
+*.ipynb   datatype=jupyter-notebook  import=automerge:P6fSLEBjEuZSMk6MUdoQvRyLLAK  strip-metadata
+
+# Input data is replaced whole, not merged character by character
+data/**   artifact

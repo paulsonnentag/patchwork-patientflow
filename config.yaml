@@ -1,0 +1,60 @@
+# List of prediction times
+prediction_times:
+  - [6, 0]
+  - [9, 30]
+  - [12, 0]
+  - [15, 30]
+  - [22, 0]
+
+# Training, validation and test set dates, in ascending chronological order.
+# Optionally, a fifth date may be added as the SECOND item to configure a
+# calibration window between training and validation, e.g.
+#   - 2031-03-01 # start training set
+#   - 2031-08-01 # start calibration set (optional)
+#   - 2031-09-01 # start validation set
+#   - 2031-10-01 # start test set
+#   - 2032-01-01 # end test set
+# With a calibration window, probability calibration is fitted on that window
+# and validation stays eval-only. With four dates, calibration is fitted on
+# the validation set (legacy behaviour), so validation calibration plots are
+# not honest holdout evidence.
+modelling_dates:
+  - 2031-03-01 # start training set
+  - 2031-08-01 # start calibration set
+  - 2031-09-01 # start validation set
+  - 2031-10-01 # start test set
+  - 2032-01-01 # end test set
+
+# desired error for Poisson distribution (1 - sum of each approximated Poisson)
+epsilon: 1e-7
+
+# enter desired time interval for the calculation of aspiration yet-to-arrive in minutes
+yta_time_interval: 15
+
+# time window after prediction time in minutes
+prediction_window: 480
+
+# Target number of hours for ED admissions
+x1: 4
+
+# Target proportion of patients admitted by time x1.
+y1: .80
+
+# Target number of hours by which all but a small minority of patients will have been admitted (must be > x1)
+x2: 12
+
+# Target proportion of patients admitted by time x2.
+y2: .99
+
+# Hierarchy configuration
+# Defines the organizational hierarchy structure
+levels:
+  - entity_type: specialty
+    parent_type: division
+    level_order: 0
+  - entity_type: division
+    parent_type: hospital
+    level_order: 1
+  - entity_type: hospital
+    parent_type: null
+    level_order: 2

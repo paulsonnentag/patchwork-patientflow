@@ -1,0 +1,5 @@
+# local environment and caches
+/.venv/
+__pycache__/
+*.egg-info/
+.ipynb_checkpoints/
