@@ -146,6 +146,29 @@ def test_metrics(models: dict[str, TrainedClassifier]) -> pd.DataFrame:
     ).T.round(3)
 
 
+def in_ed_bias(results: AnalysisResults) -> pd.DataFrame:
+    """Across all test days, per snapshot time: predicted vs observed admissions from the ED,
+    and how often the observed count falls inside the central 90% of the prediction."""
+    rows = {}
+    for pt in results.prediction_times:
+        days = results.prob_dists[get_model_key(MODEL_NAME, pt)].values()
+        expected, observed, covered = [], [], []
+        for day in days:
+            proba = day["agg_predicted"]["agg_proba"]
+            cdf = proba.cumsum()
+            expected.append((proba.index * proba).sum())
+            observed.append(day["agg_observed"])
+            covered.append(np.searchsorted(cdf, 0.05) <= day["agg_observed"] <= np.searchsorted(cdf, 0.95))
+        rows[format_clock(timedelta(hours=pt[0], minutes=pt[1]))] = {
+            "days": len(observed),
+            "mean expected": np.mean(expected),
+            "mean observed": np.mean(observed),
+            "mean error": np.mean(np.subtract(expected, observed)),
+            "90% interval coverage": np.mean(covered),
+        }
+    return pd.DataFrame(rows).T.round(2)
+
+
 # Data
 
 
