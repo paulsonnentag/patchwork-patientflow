@@ -202,7 +202,7 @@ def train_models(
             visit_col="visit_number",
             use_balanced_training=True,
             calibrate_probabilities=True,
-            calibration_method="isotonic",
+            calibration_method="sigmoid",
             evaluate_on_test=True,
         )
         for pt in prediction_times
