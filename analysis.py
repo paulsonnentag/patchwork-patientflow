@@ -44,6 +44,7 @@ EXCLUDE_FROM_TRAINING = [
     "consultation_sequence",
     "specialty",
     "final_sequence",
+    "latest_obs_manchester_triage_acuity",
 ]
 ORDINAL_MAPPINGS = {
     "age_group": ["0-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-115"],
