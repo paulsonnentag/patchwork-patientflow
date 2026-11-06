@@ -19,7 +19,7 @@ prediction_times:
 # the validation set (legacy behaviour), so validation calibration plots are
 # not honest holdout evidence.
 modelling_dates:
-  - 2031-05-01 # start training set
+  - 2031-03-01 # start training set
   - 2031-08-01 # start calibration set
   - 2031-09-01 # start validation set
   - 2031-10-01 # start test set
