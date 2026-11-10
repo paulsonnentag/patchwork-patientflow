@@ -274,3 +274,70 @@ def combine_demand(in_ed: pd.DataFrame, yet_to_arrive: pd.DataFrame) -> pd.DataF
 # Figures
 
 
+def madcap_figure(results: AnalysisResults) -> Figure:
+    return plot_madcap(
+        results.models,
+        results.splits.test,
+        exclude_from_training_data=EXCLUDE_FROM_TRAINING,
+        return_figure=True,
+    )
+
+
+def epudd_figure(results: AnalysisResults) -> Figure:
+    return plot_epudd(
+        results.prediction_times,
+        results.prob_dists,
+        model_name=MODEL_NAME,
+        suptitle="EPUDD plots: observed vs predicted bed counts by snapshot time",
+        return_figure=True,
+    )
+
+
+def in_ed_figure(results: AnalysisResults) -> Figure:
+    in_ed = in_ed_prediction(results)
+    fig = plot_prob_dist(
+        in_ed["agg_predicted"],
+        f"Beds needed by patients in the ED at {window_label(results)[0]} on {results.example_day}",
+        include_titles=True,
+        return_figure=True,
+    )
+    ax = fig.gca()
+    ax.axvline(in_ed["agg_observed"], color="red", linestyle="--", label="Observed")
+    ax.legend()
+    return fig
+
+
+def yet_to_arrive_figure(results: AnalysisResults) -> Figure:
+    start, end = window_label(results)
+    return plot_prob_dist(
+        results.yet_to_arrive,
+        f"Beds needed by patients arriving {start}–{end} on {results.example_day}"
+        f"\n(if the {results.inputs.params['x1']}-hour target is met)",
+        include_titles=True,
+        truncate_at_beds=30,
+        return_figure=True,
+    )
+
+
+def total_demand_figure(results: AnalysisResults) -> Figure:
+    start, end = window_label(results)
+    return plot_prob_dist(
+        results.total_demand,
+        f"Total beds needed {start}–{end} on {results.example_day}",
+        include_titles=True,
+        truncate_at_beds=60,
+        probability_levels=[0.9, 0.7],
+        return_figure=True,
+    )
+
+
+def window_label(results: AnalysisResults) -> tuple[str, str]:
+    hour, minute = results.prediction_time
+    start = timedelta(hours=hour, minutes=minute)
+    end = (start + results.prediction_window) % timedelta(days=1)
+    return format_clock(start), format_clock(end)
+
+
+def format_clock(t: timedelta) -> str:
+    minutes = int(t.total_seconds()) // 60
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
