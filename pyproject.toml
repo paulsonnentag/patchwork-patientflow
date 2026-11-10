@@ -1,0 +1,16 @@
+[project]
+name = "patchwork-patientflow"
+version = "0.1.0"
+description = "Emergency bed-demand analysis with patientflow"
+requires-python = ">=3.10"
+dependencies = ["patientflow==1.9.0"]
+
+[project.optional-dependencies]
+notebook = ["jupyter", "ipykernel"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["analysis"]
