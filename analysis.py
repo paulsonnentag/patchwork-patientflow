@@ -226,3 +226,51 @@ def predict_bed_counts(
     return prob_dists
 
 
+def in_ed_prediction(results: AnalysisResults) -> dict[str, Any]:
+    key = get_model_key(MODEL_NAME, results.prediction_time)
+    return results.prob_dists[key][results.example_day]
+
+
+# Patients yet to arrive
+
+
+def fit_yet_to_arrive(inpatient_arrivals: pd.DataFrame) -> ParametricIncomingAdmissionPredictor:
+    train = inpatient_arrivals[inpatient_arrivals.training_validation_test == "train"]
+    model = ParametricIncomingAdmissionPredictor()
+    model.fit(
+        train,
+        yta_time_interval=timedelta(minutes=15),
+        num_days=train.index.normalize().nunique(),
+    )
+    return model
+
+
+def predict_yet_to_arrive(
+    model: ParametricIncomingAdmissionPredictor,
+    params: dict[str, Any],
+    day: date,
+    prediction_time: PredictionTime,
+    prediction_window: timedelta,
+) -> pd.DataFrame:
+    """Beds needed by patients arriving after prediction_time, if the ED meets the target in config.yaml."""
+    return model.predict(
+        prediction_time=prediction_time,
+        prediction_window=prediction_window,
+        prediction_date=day,
+        x1=params["x1"],
+        y1=params["y1"],
+        x2=params["x2"],
+        y2=params["y2"],
+        max_value=50,
+    )["unfiltered"]
+
+
+def combine_demand(in_ed: pd.DataFrame, yet_to_arrive: pd.DataFrame) -> pd.DataFrame:
+    """Sum of two independent bed counts: the convolution of their distributions."""
+    total = np.convolve(in_ed["agg_proba"].to_numpy(), yet_to_arrive["agg_proba"].to_numpy())
+    return pd.DataFrame({"agg_proba": total})
+
+
+# Figures
+
+
