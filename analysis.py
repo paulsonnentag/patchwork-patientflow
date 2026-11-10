@@ -140,3 +140,89 @@ def summarise_demand(results: AnalysisResults) -> pd.Series:
     ).round(1)
 
 
+def test_metrics(models: dict[str, TrainedClassifier]) -> pd.DataFrame:
+    return pd.DataFrame(
+        {key: model.training_results.test_results for key, model in models.items()}
+    ).T.round(3)
+
+
+# Data
+
+
+def load_inputs() -> Inputs:
+    ed_visits = load_data(
+        DATA_DIR,
+        file_name="ed_visits.csv",
+        index_column="snapshot_id",
+        sort_columns=["visit_number", "snapshot_date", "prediction_time"],
+        eval_columns=["prediction_time", "consultation_sequence", "final_sequence"],
+    )
+    ed_visits["snapshot_date"] = pd.to_datetime(ed_visits["snapshot_date"]).dt.date
+
+    inpatient_arrivals = load_data(
+        DATA_DIR, file_name="inpatient_arrivals.csv", index_column="arrival_datetime"
+    )
+    inpatient_arrivals.index = pd.to_datetime(inpatient_arrivals.index)
+
+    return Inputs(ed_visits, inpatient_arrivals, load_config_file(CONFIG_PATH))
+
+
+def split_visits(inputs: Inputs) -> Splits:
+    params = inputs.params
+    train, calibration, validation, test = create_temporal_splits(
+        inputs.ed_visits,
+        params["start_training_set"],
+        params["start_validation_set"],
+        params["start_test_set"],
+        params["end_test_set"],
+        col_name="snapshot_date",
+        visit_col="visit_number",
+        start_calibration=params["start_calibration_set"],
+        verbose=False,
+    )
+    return Splits(train, calibration, validation, test)
+
+
+# Patients already in the ED
+
+
+def train_models(
+    splits: Splits, prediction_times: list[PredictionTime]
+) -> dict[str, TrainedClassifier]:
+    return {
+        get_model_key(MODEL_NAME, pt): train_classifier(
+            train_visits=splits.train,
+            valid_visits=splits.validation,
+            test_visits=splits.test,
+            calibration_visits=splits.calibration,
+            prediction_time=pt,
+            grid={"n_estimators": [30]},
+            exclude_from_training_data=EXCLUDE_FROM_TRAINING,
+            ordinal_mappings=ORDINAL_MAPPINGS,
+            visit_col="visit_number",
+            use_balanced_training=True,
+            calibrate_probabilities=True,
+            calibration_method="isotonic",
+            evaluate_on_test=True,
+        )
+        for pt in prediction_times
+    }
+
+
+def predict_bed_counts(
+    models: dict[str, TrainedClassifier],
+    visits: pd.DataFrame,
+    prediction_times: list[PredictionTime],
+) -> ProbDists:
+    """For each snapshot time and day, the distribution of how many patients in the ED will be admitted."""
+    prob_dists: ProbDists = {}
+    for pt in prediction_times:
+        key = get_model_key(MODEL_NAME, pt)
+        X, y = prepare_patient_snapshots(
+            df=visits, prediction_time=pt, single_snapshot_per_visit=False, visit_col="visit_number"
+        )
+        groups = prepare_group_snapshot_dict(visits[visits.prediction_time == pt])
+        prob_dists[key] = get_prob_dist(groups, X, y, models[key])
+    return prob_dists
+
+
