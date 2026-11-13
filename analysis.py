@@ -196,7 +196,7 @@ def train_models(
             test_visits=splits.test,
             calibration_visits=splits.calibration,
             prediction_time=pt,
-            grid={"n_estimators": [30]},
+            grid={"n_estimators": [30, 100], "max_depth": [3, 5]},
             exclude_from_training_data=EXCLUDE_FROM_TRAINING,
             ordinal_mappings=ORDINAL_MAPPINGS,
             visit_col="visit_number",
