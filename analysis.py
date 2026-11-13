@@ -35,7 +35,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"
 
 MODEL_NAME = "admissions"
-EXAMPLE_DAY = date(2031, 10, 11)
+EXAMPLE_DAY = date(2031, 10, 13)
 
 EXCLUDE_FROM_TRAINING = [
     "snapshot_date",
