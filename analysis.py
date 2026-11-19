@@ -88,7 +88,7 @@ class AnalysisResults:
 def run_analysis(
     example_day: date = EXAMPLE_DAY,
     prediction_time: PredictionTime = (12, 0),
-    prediction_window: timedelta = timedelta(hours=8),
+    prediction_window: timedelta = timedelta(hours=12),
 ) -> AnalysisResults:
     inputs = load_inputs()
     splits = split_visits(inputs)
