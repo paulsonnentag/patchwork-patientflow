@@ -218,7 +218,7 @@ def train_models(
             valid_visits=splits.validation,
             test_visits=splits.test,
             calibration_visits=splits.calibration,
-            prediction_time=pt,
+            prediction_time=pt,http://localhost:5174/#doc=3fksFrvTReu2jugx3CrbZG8f2i84
             grid={"n_estimators": [30, 100], "max_depth": [3, 5]},
             exclude_from_training_data=EXCLUDE_FROM_TRAINING,
             ordinal_mappings=ORDINAL_MAPPINGS,
