@@ -20,7 +20,7 @@ prediction_times:
 # not honest holdout evidence.
 modelling_dates:
   - 2031-03-01 # start training set
-  - 2031-08-01 # start calibration set
+  - 2031-07-01 # start calibration set
   - 2031-09-01 # start validation set
   - 2031-10-01 # start test set
   - 2032-01-01 # end test set
