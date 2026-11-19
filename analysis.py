@@ -44,11 +44,11 @@ EXCLUDE_FROM_TRAINING = [
     "consultation_sequence",
     "specialty",
     "final_sequence",
+    "latest_obs_objective_pain_score",
 ]
 ORDINAL_MAPPINGS = {
     "age_group": ["0-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-115"],
     "latest_obs_manchester_triage_acuity": ["Blue", "Green", "Yellow", "Orange", "Red"],
-    "latest_obs_objective_pain_score": ["Nil", "Mild", "Moderate", "Severe_Very Severe"],
     "latest_obs_level_of_consciousness": ["A", "C", "V", "P", "U"],
 }
 
