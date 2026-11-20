@@ -152,6 +152,14 @@ def in_ed_bias(results: AnalysisResults) -> pd.DataFrame:
     rows = {}
     for pt in results.prediction_times:
         days = results.prob_dists[get_model_key(MODEL_NAME, pt)].values()
+        expected, observed, covered = [], [], []
+        for day in days:
+            proba = day["agg_predicted"]["agg_proba"]
+            cdf = proba.cumsum()
+            expected.append((proba.index * proba).sum())
+            observed.append(day["agg_observed"])
+            covered.append(np.searchsorted(cdf, 0.05) <= day["agg_observed"] <= np.searchsorted(cdf, 0.95))
+        rows[format_clock(timedelta(hours=pt[0], minutes=pt[1]))] = {
 
 
 # Data
