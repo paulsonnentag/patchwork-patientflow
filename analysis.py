@@ -160,6 +160,13 @@ def in_ed_bias(results: AnalysisResults) -> pd.DataFrame:
             observed.append(day["agg_observed"])
             covered.append(np.searchsorted(cdf, 0.05) <= day["agg_observed"] <= np.searchsorted(cdf, 0.95))
         rows[format_clock(timedelta(hours=pt[0], minutes=pt[1]))] = {
+            "days": len(observed),
+            "mean expected": np.mean(expected),
+            "mean observed": np.mean(observed),
+            "mean error": np.mean(np.subtract(expected, observed)),
+            "90% interval coverage": np.mean(covered),
+        }
+    return pd.DataFrame(rows).T.round(2)
 
 
 # Data
