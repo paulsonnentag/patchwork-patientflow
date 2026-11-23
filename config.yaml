@@ -5,6 +5,7 @@ prediction_times:
   - [9, 30]
   - [12, 0]
   - [15, 30]
+  - [18, 0]
   - [22, 0]
 
 # Training, validation and test set dates, in ascending chronological order.
