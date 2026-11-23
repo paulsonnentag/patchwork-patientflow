@@ -1,6 +1,7 @@
 # List of prediction times
 prediction_times:
   - [6, 0]
+  - [8, 0]
   - [9, 30]
   - [12, 0]
   - [15, 30]
